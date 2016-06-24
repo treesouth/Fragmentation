@@ -2,7 +2,6 @@ package me.yokeyword.sample.flow;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -15,7 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.socks.library.KLog;
 import me.yokeyword.fragmentation.SupportActivity;
 import me.yokeyword.fragmentation.SupportFragment;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
@@ -30,8 +28,14 @@ import me.yokeyword.sample.flow.ui.fragment_swipe_back.SwipeBackSampleFragment;
 /**
  * Created by YoKeyword on 16/1/29.
  */
-public class MainActivity extends SupportActivity implements NavigationView.OnNavigationItemSelectedListener, BaseMainFragment.OnFragmentOpenDrawerListener, LoginFragment.OnLoginSuccessListener, SwipeBackSampleFragment.OnLockDrawLayoutListener {
+public class MainActivity extends SupportActivity
+        implements NavigationView.OnNavigationItemSelectedListener, BaseMainFragment.OnFragmentOpenDrawerListener
+        , LoginFragment.OnLoginSuccessListener, SwipeBackSampleFragment.OnLockDrawLayoutListener {
     public static final String TAG = MainActivity.class.getSimpleName();
+
+    // 再点一次退出程序时间设置
+    private static final long WAIT_TIME = 2000L;
+    private long TOUCH_TIME = 0;
 
     private DrawerLayout mDrawer;
     private NavigationView mNavigationView;
@@ -44,10 +48,7 @@ public class MainActivity extends SupportActivity implements NavigationView.OnNa
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            KLog.e(TAG, "savedInstanceState == null");
             loadRootFragment(R.id.fl_container, HomeFragment.newInstance());
-        } else {
-            KLog.e(TAG, "savedInstanceState != null");
         }
 
         initView();
@@ -65,7 +66,8 @@ public class MainActivity extends SupportActivity implements NavigationView.OnNa
 
     private void initView() {
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawer, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, mDrawer, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         //        mDrawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -92,19 +94,27 @@ public class MainActivity extends SupportActivity implements NavigationView.OnNa
     }
 
     @Override
-    public void onBackPressed() {
-        KLog.e(TAG);
+    public void onBackPressedSupport() {
         if (mDrawer.isDrawerOpen(GravityCompat.START)) {
             mDrawer.closeDrawer(GravityCompat.START);
         } else {
-
             Fragment topFragment = getTopFragment();
 
             // 主页的Fragment
-            if (topFragment instanceof DiscoverFragment || topFragment instanceof ShopFragment) {
+            if (topFragment instanceof BaseMainFragment) {
                 mNavigationView.setCheckedItem(R.id.nav_home);
             }
-            super.onBackPressed();
+
+            if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+                pop();
+            } else {
+                if (System.currentTimeMillis() - TOUCH_TIME < WAIT_TIME) {
+                    finish();
+                } else {
+                    TOUCH_TIME = System.currentTimeMillis();
+                    Toast.makeText(this, R.string.press_again_exit,Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 
