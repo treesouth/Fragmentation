@@ -58,7 +58,7 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
     }
 
     /**
-     * 获取设置的全局动画
+     * 获取设置的全局动画, copy
      *
      * @return FragmentAnimator
      */
@@ -78,7 +78,7 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
 
     /**
      * 构建Fragment转场动画
-     * <p>
+     * <p/>
      * 如果是在Activity内实现,则构建的是Activity内所有Fragment的转场动画,
      * 如果是在Fragment内实现,则构建的是该Fragment的转场动画,此时优先级 > Activity的onCreateFragmentAnimator()
      *
@@ -88,21 +88,19 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
         return new DefaultVerticalAnimator();
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            // 这里是防止动画过程中，按返回键取消加载Fragment
-            if (!mFragmentClickable) {
-                setFragmentClickable(true);
-            }
-        }
-        return super.onKeyDown(keyCode, event);
+    /**
+     * (因为事务异步的原因) 如果你想在onCreate()中使用start/pop等 Fragment事务方法, 请使用该方法把你的任务入队
+     *
+     * @param runnable 需要执行的任务
+     */
+    protected void enqueueAction(Runnable runnable) {
+        getHandler().post(runnable);
     }
 
     /**
-     * 注意,如果你需要复写该方法,请务必在需要finish Activity的代码处,使用super.onBackPressed()代替,以保证SupportFragment的onBackPressedSupport()方法可以正常工作
-     * 该方法默认在回退栈内Fragment数大于1时,按返回键使Fragment pop, 小于等于1时,finish Activity.
+     * 不建议复写该方法,请使用 {@link #onBackPressedSupport} 代替
      */
+    @Deprecated
     @Override
     public void onBackPressed() {
         // 这里是防止动画过程中，按返回键取消加载Fragment
@@ -125,7 +123,7 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
      */
     public void onBackPressedSupport() {
         if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
-            mFragmentation.back(getSupportFragmentManager());
+            pop();
         } else {
             finish();
         }
@@ -245,6 +243,16 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
         mPopMulitpleNoAnim = false;
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            // 这里是防止动画过程中，按返回键取消加载Fragment
+            if (!mFragmentClickable) {
+                setFragmentClickable(true);
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
