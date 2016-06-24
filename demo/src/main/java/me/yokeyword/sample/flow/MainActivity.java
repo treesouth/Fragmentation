@@ -2,6 +2,7 @@ package me.yokeyword.sample.flow;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -14,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.socks.library.KLog;
 import me.yokeyword.fragmentation.SupportActivity;
 import me.yokeyword.fragmentation.SupportFragment;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
@@ -28,9 +30,7 @@ import me.yokeyword.sample.flow.ui.fragment_swipe_back.SwipeBackSampleFragment;
 /**
  * Created by YoKeyword on 16/1/29.
  */
-public class MainActivity extends SupportActivity
-        implements NavigationView.OnNavigationItemSelectedListener, BaseMainFragment.OnFragmentOpenDrawerListener
-        , LoginFragment.OnLoginSuccessListener, SwipeBackSampleFragment.OnLockDrawLayoutListener {
+public class MainActivity extends SupportActivity implements NavigationView.OnNavigationItemSelectedListener, BaseMainFragment.OnFragmentOpenDrawerListener, LoginFragment.OnLoginSuccessListener, SwipeBackSampleFragment.OnLockDrawLayoutListener {
     public static final String TAG = MainActivity.class.getSimpleName();
 
     private DrawerLayout mDrawer;
@@ -44,7 +44,10 @@ public class MainActivity extends SupportActivity
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
+            KLog.e(TAG, "savedInstanceState == null");
             loadRootFragment(R.id.fl_container, HomeFragment.newInstance());
+        } else {
+            KLog.e(TAG, "savedInstanceState != null");
         }
 
         initView();
@@ -55,16 +58,15 @@ public class MainActivity extends SupportActivity
         // 设置默认Fragment动画  默认竖向(和安卓5.0以上的动画相同)
         return super.onCreateFragmentAnimator();
         // 设置横向(和安卓4.x动画相同)
-//        return new DefaultHorizontalAnimator();
+        //        return new DefaultHorizontalAnimator();
         // 设置自定义动画
-//        return new FragmentAnimator(enter,exit,popEnter,popExit);
+        //        return new FragmentAnimator(enter,exit,popEnter,popExit);
     }
 
     private void initView() {
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, mDrawer, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        mDrawer.setDrawerListener(toggle);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawer, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        //        mDrawer.setDrawerListener(toggle);
         toggle.syncState();
 
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -91,6 +93,7 @@ public class MainActivity extends SupportActivity
 
     @Override
     public void onBackPressed() {
+        KLog.e(TAG);
         if (mDrawer.isDrawerOpen(GravityCompat.START)) {
             mDrawer.closeDrawer(GravityCompat.START);
         } else {
@@ -158,7 +161,7 @@ public class MainActivity extends SupportActivity
                         });
                     } else {
                         // 如果已经在栈内,则以SingleTask模式start
-//                        start(fragment, SupportFragment.SINGLETASK);
+                        //                        start(fragment, SupportFragment.SINGLETASK);
                         popTo(ShopFragment.class, false);
                     }
                 } else if (id == R.id.nav_login) {

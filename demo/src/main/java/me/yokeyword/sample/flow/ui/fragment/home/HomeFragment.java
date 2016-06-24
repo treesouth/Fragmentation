@@ -13,19 +13,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import me.yokeyword.fragmentation.anim.DefaultHorizontalAnimator;
 import me.yokeyword.fragmentation.anim.DefaultNoAnimator;
 import me.yokeyword.fragmentation.anim.DefaultVerticalAnimator;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
 import me.yokeyword.sample.R;
-import me.yokeyword.sample.common.adapter.HomeAdapter;
-import me.yokeyword.sample.common.OnItemClickListener;
 import me.yokeyword.sample.common.Article;
+import me.yokeyword.sample.common.OnItemClickListener;
+import me.yokeyword.sample.common.adapter.HomeAdapter;
 import me.yokeyword.sample.flow.ui.BaseMainFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class HomeFragment extends BaseMainFragment implements Toolbar.OnMenuItemClickListener {

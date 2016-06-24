@@ -10,13 +10,12 @@ import android.support.v4.app.FragmentTransactionBugFixHack;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import me.yokeyword.fragmentation.debug.DebugFragmentRecord;
 import me.yokeyword.fragmentation.helper.FragmentResultRecord;
 import me.yokeyword.fragmentation.helper.OnEnterAnimEndListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**

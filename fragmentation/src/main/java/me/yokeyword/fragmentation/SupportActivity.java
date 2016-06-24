@@ -4,20 +4,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
-
-import java.util.List;
-
 import me.yokeyword.fragmentation.anim.DefaultVerticalAnimator;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
 import me.yokeyword.fragmentation.debug.DebugFragmentRecord;
 import me.yokeyword.fragmentation.debug.DebugHierarchyViewContainer;
+
+import java.util.List;
 
 /**
  * Created by YoKeyword on 16/1/22.
@@ -201,7 +199,7 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
     }
 
     /**
-     * 获取栈内的framgent对象
+     * 获取栈内的fragment对象
      *
      * @param fragmentClass
      */
