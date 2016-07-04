@@ -1,6 +1,8 @@
 # Fragmentation
 A powerful library that manage Fragment for Android!
 
+## [English README](https://github.com/YoKeyword/Fragmentation/blob/master/README_EN.md)
+
 为"单Activity ＋ 多Fragment","多模块Activity + 多Fragment"架构而生，帮你大大简化使用过程，轻松解决各种复杂嵌套等问题，修复了官方Fragment库中存在的一些BUG。
 
 ![](/gif/logo.png)
@@ -14,23 +16,25 @@ A powerful library that manage Fragment for Android!
 
 
 # Demo演示：
-单Activity + 多Fragment，第一个为简单场景demo，第二个为仿知乎的复杂嵌套demo
+均为单Activity + 多Fragment，第一个为简单流式demo，第二个为仿微信交互的demo(全页面支持滑动退出)，第三个为仿知乎交互的复杂嵌套demo
 
-<img src="/gif/demo.gif" width="320px"/>
-&emsp;&emsp;&emsp;&emsp;<img src="/gif/nested.gif" width="320px"/>
+<img src="/gif/demo.gif" width="280px"/>&emsp;<img src="/gif/wechat.gif" width="280px"/>
+&emsp;<img src="/gif/nested.gif" width="280px"/>
 
 # 特性
+# FEATURES
+
 1、**有效解决各种复杂嵌套、同级等Fragment重叠问题**
 
 2、**实时查看Fragment的(包括嵌套Fragment)栈视图的对话框和Log，方便调试**
 
-3、**增加启动模式、startForResult等类似Activity的方法**
+3、**增加启动模式、startForResult等类似Activity方法**
 
 4、**类似Android事件分发机制的Fragment回退方法：onBackPressedSupport()，轻松为每个Fragment实现Back按键事件**
 
 5、**完美的防抖动解决方案(防止用户点击速度过快,导致启动多个Fragment)**
 
-6、**提供可轻松设定Fragment转场动画的解决方案**
+6、**提供可轻松 设定Fragment转场动画 的解决方案**
 
 7、**修复官方库里pop(tag/id)出栈多个Fragment时的一些BUG**
 
@@ -41,7 +45,9 @@ A powerful library that manage Fragment for Android!
 # 重大更新日志
 ### 0.7.X 来了！！
 
-1、仿知乎的新Demo，展示复杂嵌套Fragment的交互场景
+新: 0.7.7 : 更改方法,添加参数 onEnterAnimtionEnd() -> onEnterAnimtionEnd(Bundle savedInstanceState)
+
+1、2个新demo: 仿知乎交互 ＋ 仿微信交互的新Demo，展示复杂嵌套Fragment的交互场景
 
 2、全新的Fragment恢复机制
 
@@ -54,37 +60,39 @@ A powerful library that manage Fragment for Android!
 6、全新的类似Android事件分发机制的onBackPressedSupport()
 
 # 如何使用
+
 **1. 项目下app的build.gradle中依赖：**
 ````gradle
 // appcompat v7包是必须的
-compile 'me.yokeyword:fragmentation:0.7.5'
+compile 'me.yokeyword:fragmentation:0.7.7'
 // 如果想使用SwipeBack 滑动边缘退出Fragment/Activity功能，请再添加下面的库
-// compile 'me.yokeyword:fragmentation-swipeback:0.3.0'
+// compile 'me.yokeyword:fragmentation-swipeback:0.3.1'
 ````
 
 **2. Activity继承SupportActivity：**
 ````java
 public class MainActivity extends SupportActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(...);
-        if (savedInstanceState == null) {
-            loadRootFragment(R.id.fl_container, HomeFragment.newInstance());  
-        }
-    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(...);
+        if (savedInstanceState == null) {
+            loadRootFragment(R.id.fl_container, HomeFragment.newInstance());  
+        }
+    }
 ````
 
 **3. Fragment继承SupportFragment：**
 ````java
 public class HomeFragment extends SupportFragment {
 
-    private void xxx() {
-        // 启动新的Fragment, 同时还有start(fragment,SINGTASK)、startForResult、startWithPop等启动方法
+    private void xxx() {
+        // 启动新的Fragment, 另外还有start(fragment,SINGTASK)、startForResult、startWithPop等启动方法
         start(DetailFragment.newInstance(HomeBean));
         // ... 其他pop, find, 设置动画等等API, 请自行查看WIKI
     }
+}
 ````
 
 ### [进一步使用，查看wiki](https://github.com/YoKeyword/Fragmentation/wiki)

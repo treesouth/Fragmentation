@@ -19,6 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
 import me.yokeyword.fragmentation.helper.FragmentResultRecord;
 import me.yokeyword.fragmentation.helper.OnEnterAnimEndListener;
+import me.yokeyword.fragmentation.helper.OnFragmentDestoryViewListener;
 
 /**
  * Created by YoKeyword on 16/1/22.
@@ -55,6 +56,8 @@ public class SupportFragment extends Fragment implements ISupportFragment {
     private boolean mEnterAnimFlag = false; // 用于记录无动画时,解除 防抖动处理
 
     protected boolean mLocking; // 是否加锁 用于Fragmentation-SwipeBack库
+
+    private OnFragmentDestoryViewListener mFragmentDestoryViewListener;
 
     @Override
     public void onAttach(Activity activity) {
@@ -145,7 +148,7 @@ public class SupportFragment extends Fragment implements ISupportFragment {
 
     @Override
     public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
-        if (_mActivity.mPopMulitpleNoAnim || mLocking) {
+        if (_mActivity.mPopMultipleNoAnim || mLocking) {
             return mNoAnim;
         }
         if (transit == FragmentTransaction.TRANSIT_FRAGMENT_OPEN) {
@@ -194,10 +197,10 @@ public class SupportFragment extends Fragment implements ISupportFragment {
 
         if (savedInstanceState != null) {
             // 强杀重启时,系统默认Fragment恢复时无动画,所以这里手动调用下
-            onEnterAnimationEnd();
+            notifyEnterAnimationEnd(savedInstanceState);
             _mActivity.setFragmentClickable(true);
         } else if (mEnterAnimFlag) { // 无动画
-            onEnterAnimationEnd();
+            notifyEnterAnimationEnd(null);
             _mActivity.setFragmentClickable(true);
         }
 
@@ -276,7 +279,16 @@ public class SupportFragment extends Fragment implements ISupportFragment {
     /**
      * 入栈动画 结束时,回调
      */
-    protected void onEnterAnimationEnd() {
+    protected void onEnterAnimationEnd(Bundle savedInstanceState) {
+    }
+
+    private void notifyEnterAnimationEnd(final Bundle savedInstanceState) {
+        _mActivity.getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                onEnterAnimationEnd(savedInstanceState);
+            }
+        });
     }
 
     /**
@@ -422,7 +434,7 @@ public class SupportFragment extends Fragment implements ISupportFragment {
     }
 
     /**
-     * @return 栈内fragmentClass的framgent对象
+     * @return 栈内fragmentClass的fragment对象
      */
     @Override
     public <T extends SupportFragment> T findFragment(Class<T> fragmentClass) {
@@ -430,7 +442,7 @@ public class SupportFragment extends Fragment implements ISupportFragment {
     }
 
     /**
-     * @return 栈内fragmentClass的子framgent对象
+     * @return 栈内fragmentClass的子fragment对象
      */
     @Override
     public <T extends SupportFragment> T findChildFragment(Class<T> fragmentClass) {
@@ -550,11 +562,33 @@ public class SupportFragment extends Fragment implements ISupportFragment {
      * 入场动画结束时,回调
      */
     void notifyEnterAnimEnd() {
-        onEnterAnimationEnd();
+        notifyEnterAnimationEnd(null);
         _mActivity.setFragmentClickable(true);
 
         if (mOnAnimEndListener != null) {
             mOnAnimEndListener.onAnimationEnd();
         }
+    }
+
+    /**
+     * @see OnFragmentDestoryViewListener
+     */
+    void setOnFragmentDestoryViewListener(OnFragmentDestoryViewListener listener) {
+        this.mFragmentDestoryViewListener = listener;
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (mFragmentDestoryViewListener != null) {
+            mFragmentDestoryViewListener.onDestoryView();
+        }
+        super.onDestroyView();
+        mFragmentDestoryViewListener = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mOnAnimEndListener = null;
     }
 }
