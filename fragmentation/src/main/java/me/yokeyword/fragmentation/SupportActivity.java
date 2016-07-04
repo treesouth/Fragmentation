@@ -4,18 +4,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
+
 import me.yokeyword.fragmentation.anim.DefaultVerticalAnimator;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
-import me.yokeyword.fragmentation.debug.DebugFragmentRecord;
-import me.yokeyword.fragmentation.debug.DebugHierarchyViewContainer;
-
-import java.util.List;
 
 /**
  * Created by YoKeyword on 16/1/22.
@@ -25,7 +19,7 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
 
     private FragmentAnimator mFragmentAnimator;
 
-    boolean mPopMulitpleNoAnim = false;
+    boolean mPopMultipleNoAnim = false;
 
     // 防抖动 是否可以点击
     private boolean mFragmentClickable = true;
@@ -76,7 +70,7 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
 
     /**
      * 构建Fragment转场动画
-     * <p/>
+     * <p>
      * 如果是在Activity内实现,则构建的是Activity内所有Fragment的转场动画,
      * 如果是在Fragment内实现,则构建的是该Fragment的转场动画,此时优先级 > Activity的onCreateFragmentAnimator()
      *
@@ -188,8 +182,6 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
 
     /**
      * 得到位于栈顶Fragment
-     *
-     * @return
      */
     @Override
     public SupportFragment getTopFragment() {
@@ -198,8 +190,6 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
 
     /**
      * 获取栈内的fragment对象
-     *
-     * @param fragmentClass
      */
     @Override
     public <T extends SupportFragment> T findFragment(Class<T> fragmentClass) {
@@ -234,11 +224,11 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
     }
 
     void preparePopMultiple() {
-        mPopMulitpleNoAnim = true;
+        mPopMultipleNoAnim = true;
     }
 
     void popFinish() {
-        mPopMulitpleNoAnim = false;
+        mPopMultipleNoAnim = false;
     }
 
     @Override
@@ -272,73 +262,16 @@ public class SupportActivity extends AppCompatActivity implements ISupport {
     }
 
     /**
-     * 显示栈视图,调试时使用
+     * 显示栈视图dialog,调试时使用
      */
     public void showFragmentStackHierarchyView() {
-        DebugHierarchyViewContainer container = new DebugHierarchyViewContainer(this);
-        container.bindFragmentRecords(mFragmentation.getFragmentRecords());
-        container.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        new AlertDialog.Builder(this)
-                .setTitle("栈视图")
-                .setView(container)
-                .setPositiveButton("关闭", null)
-                .setCancelable(true)
-                .show();
+        mFragmentation.showFragmentStackHierarchyView();
     }
 
     /**
-     * 显示栈视图 日志 ,调试时使用
+     * 显示栈视图日志,调试时使用
      */
     public void logFragmentStackHierarchy(String TAG) {
-        List<DebugFragmentRecord> fragmentRecordList = mFragmentation.getFragmentRecords();
-        if (fragmentRecordList == null) return;
-
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = fragmentRecordList.size() - 1; i >= 0; i--) {
-            DebugFragmentRecord fragmentRecord = fragmentRecordList.get(i);
-
-            if (i == fragmentRecordList.size() - 1) {
-                sb.append("═══════════════════════════════════════════════════════════════════════════════════\n");
-                if (i == 0) {
-                    sb.append("\t栈顶\t\t\t" + fragmentRecord.fragmentName + "\n");
-                    sb.append("═══════════════════════════════════════════════════════════════════════════════════");
-                } else {
-                    sb.append("\t栈顶\t\t\t" + fragmentRecord.fragmentName + "\n\n");
-                }
-            } else if (i == 0) {
-                sb.append("\t栈底\t\t\t" + fragmentRecord.fragmentName + "\n\n");
-                processChildLog(fragmentRecord.childFragmentRecord, sb, 1);
-                sb.append("═══════════════════════════════════════════════════════════════════════════════════");
-                Log.i(TAG, sb.toString());
-                return;
-            } else {
-                sb.append("\t↓\t\t\t" + fragmentRecord.fragmentName + "\n\n");
-            }
-
-            processChildLog(fragmentRecord.childFragmentRecord, sb, 1);
-        }
-    }
-
-    private void processChildLog(List<DebugFragmentRecord> fragmentRecordList, StringBuilder sb, int childHierarchy) {
-        if (fragmentRecordList == null || fragmentRecordList.size() == 0) return;
-
-        for (int j = 0; j < fragmentRecordList.size(); j++) {
-            DebugFragmentRecord childFragmentRecord = fragmentRecordList.get(j);
-            for (int k = 0; k < childHierarchy; k++) {
-                sb.append("\t\t\t");
-            }
-            if (j == 0) {
-                sb.append("\t子栈顶\t\t" + childFragmentRecord.fragmentName + "\n\n");
-            } else if (j == fragmentRecordList.size() - 1) {
-                sb.append("\t子栈底\t\t" + childFragmentRecord.fragmentName + "\n\n");
-                processChildLog(childFragmentRecord.childFragmentRecord, sb, ++childHierarchy);
-                return;
-            } else {
-                sb.append("\t↓\t\t\t" + childFragmentRecord.fragmentName + "\n\n");
-            }
-
-            processChildLog(childFragmentRecord.childFragmentRecord, sb, childHierarchy);
-        }
+        mFragmentation.logFragmentRecords(TAG);
     }
 }
